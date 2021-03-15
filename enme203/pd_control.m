@@ -17,16 +17,20 @@ B = (km * kg) / (M * R * r);
 C = D / M + (km^2 * kg^2) / (M * R * r^2);
 
 % controller gains
-Kd = 8;
-Kp = 1000;
+Kd = 0.01;
+Kp = 12;
 
 % fraction declaration
 num = [B*Kd B*Kp];
 den = [1 C+B*Kd B*Kp];
 
-system = tf(num, den)
+system = tf(num, den);
 
 [Y, T] = step(num, den);
+
+step(num, den)
+figure()
+rlocus(system)
 
 % error terms
 E = 1-Y;
@@ -39,7 +43,7 @@ V = Kp*E + Kd*E_dot;
 % scale_factor = max(V)/max(Y);
 
 % V_scaled = V/scale_factor + 1;
-V_scaled = V + 1
+V_scaled = V + 1;
 
 figure();
 hold on
