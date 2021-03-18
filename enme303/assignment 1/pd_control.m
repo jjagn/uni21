@@ -17,8 +17,8 @@ B = (km * kg) / (M * R * r);
 C = D / M + (km^2 * kg^2) / (M * R * r^2);
 
 % controller gains
-Kd = 0.01;
-Kp = 12;
+Kd = 15.36;
+Kp = 120;
 
 % fraction declaration
 num = [B*Kd B*Kp];
@@ -26,14 +26,16 @@ den = [1 C+B*Kd B*Kp];
 
 system = tf(num, den);
 
-[Y, T] = step(num, den);
+opts = stepDataOptions('StepAmplitude', 0.1);
 
-step(num, den)
+[Y, T] = step(num, den, opts);
+
+step(num, den, opts)
 figure()
 rlocus(system)
 
 % error terms
-E = 1-Y;
+E = 0.1-Y;
 E_dot = diff(E);
 E_dot = [0; E_dot];
 
