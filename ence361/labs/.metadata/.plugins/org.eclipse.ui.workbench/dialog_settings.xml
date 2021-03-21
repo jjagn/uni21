@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="NewWizardAction">
+	</section>
+	<section name="WorkbenchPreferenceDialogSettings">
+		<item key="DIALOG_X_ORIGIN" value="2"/>
+		<item key="DIALOG_Y_ORIGIN" value="-29"/>
+	</section>
+	<section name="targetStatusBarPreferencePage">
+		<item key="targetStatusBarPreferencePage.processorId" value="TMS240C1"/>
+		<item key="targetStatusBarPreferencePage.processorType" value="Router"/>
+	</section>
+	<section name="MemoryDumperFillAction">
+	</section>
+</section>

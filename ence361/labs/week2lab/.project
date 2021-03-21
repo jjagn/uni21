@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>week2lab</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<variableList>
+		<variable>
+			<name>tiva</name>
+			<value>file:/Applications/ti/TivaWare_C_Series-2.2.0.295</value>
+		</variable>
+	</variableList>
+</projectDescription>
