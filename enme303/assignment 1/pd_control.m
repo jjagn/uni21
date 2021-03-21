@@ -5,12 +5,12 @@ clear
 clc
 close all
 
-M = 1.5; % mass of cart, kg
-km = 0.017; % motor back emf constant, V/rad/s
-kg = 3.7; % gearing ratio
-R = 1.5; % resistance of motor armature, ohms
-r = 0.018; % radius of pinion, m
-D = 7; % damping present in physical system, e.g friction
+M = 1.5;                % mass of cart, kg
+km = 0.017;             % motor back emf constant, V/rad/s
+kg = 3.7;               % gearing ratio
+R = 1.5;                % resistance of motor armature, ohms
+r = 0.018;              % radius of pinion, m
+D = 7;                  % damping present in physical system, e.g friction
 
 % constants so I don't have to type all that junk out
 B = (km * kg) / (M * R * r);
@@ -30,7 +30,9 @@ opts = stepDataOptions('StepAmplitude', 0.1);
 
 [Y, T] = step(num, den, opts);
 
-step(num, den, opts)
+% step(num, den, opts)
+step(num, den)
+
 figure()
 rlocus(system)
 
