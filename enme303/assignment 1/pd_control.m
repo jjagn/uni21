@@ -17,7 +17,7 @@ B = (km * kg) / (M * R * r);
 C = D / M + (km^2 * kg^2) / (M * R * r^2);
 
 % controller gains
-Kd = 15.36;
+Kd = 15.36;             % 15.36
 Kp = 120;
 
 % fraction declaration
@@ -25,6 +25,8 @@ num = [B*Kd B*Kp];
 den = [1 C+B*Kd B*Kp];
 
 system = tf(num, den);
+
+damp(system)
 
 opts = stepDataOptions('StepAmplitude', 0.1);
 
@@ -61,3 +63,5 @@ plot(V)
 % titlestr1 = sprintf('Requested voltage (scaled) by factor of %.3g (3 s.f)', scale_factor);
 titlestr1 = 'Requested voltage';
 ylabel(titlestr1);
+
+info = stepinfo(system)
