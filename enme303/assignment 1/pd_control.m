@@ -59,6 +59,7 @@ plot(Y)
 ylabel('system response');
 yyaxis left
 plot(V)
+hold off
 
 % titlestr1 = sprintf('Requested voltage (scaled) by factor of %.3g (3 s.f)', scale_factor);
 titlestr1 = 'Requested voltage';
