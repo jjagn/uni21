@@ -14,7 +14,7 @@ D2 = 0.05;
 D3 = 0.04;
 L = 25.1; % 25.1
 eta = 0.68;
-eps = 0; % 0
+eps = 0.3 / 1000; % 0
 zA = 2.1;
 zB = 9.1; % 9.1
 
@@ -31,23 +31,23 @@ eqns = [eqn1; eqn2; eqn3; eqn4; eqn5];
 
 vars = [hl, v1, f1, f2, f3];
 
-S = solve(eqns, vars);
+initial = [18 5 0.015 0.015 0.015];
 
-hl = double(S.hl)
+S = vpasolve(eqns, vars, initial);
+
+hl = double(S.hl);
 v1 = double(S.v1);
-f1 = double(S.f1)
+f1 = double(S.f1);
 f2 = double(S.f2);
 f3 = double(S.f3);
-
-% X0 = [0; 0; 0; 0; 0] % needs to have initial guesses for colebrook equation?
-
-% X = fsolve(F, X0)
 
 v2 = sqrt(f1/f2 * D2/D1) * double(S.v1); 
 v3 = sqrt(f1/f3 * D3/D1) * double(S.v1);
 
-v_dot1 = pi*D1^2/4*double(S.v1)
-v_dot2 = pi*D2^2/4*double(v2)
-v_dot3 = pi*D3^2/4*double(v3)
+v_dot1 = pi*D1^2/4*double(S.v1);
+v_dot2 = pi*D2^2/4*double(v2);
+v_dot3 = pi*D3^2/4*double(v3);
 
-v_dot = v_dot1 + v_dot2 + v_dot3
+v_dot = v_dot1 + v_dot2 + v_dot3;
+
+ans = [v_dot v_dot1 v_dot2 v_dot3 hl]
