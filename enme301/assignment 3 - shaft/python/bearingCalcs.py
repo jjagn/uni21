@@ -3,14 +3,14 @@ import math
 # required revolutions in 20 year life
 required_life = 506.88
 
-f0 = 14.7 # calculation factor from bearing specs
-C = 63.7 # basic dynamic load rating C
-C0 = 45 # basic static load rating C0
-e = 0.43# load ratio factor
+f0 = 13.6 # calculation factor from bearing specs
+C = 229 # basic dynamic load rating C
+C0 = 216 # basic static load rating C0
+e = 0.29 # load ratio factor
 
 
 X = 0.56 # factor for axial load
-Y = 1.03 # factor for radial load
+Y = 1.5 # factor for radial load
 
 c = 0.2 # distance of pulley from bearing
 
@@ -21,11 +21,11 @@ calc_factor = f0 * Fa / C0
 
 print(calc_factor)
 
-print(Fr)
+# print(Fr)
 
 P = X*Fr + Y*Fa # equivalent dynamic load
 
-print(P)
+print("C must be > {:.2f}".format(8*P))
 
 rated_life = (C/P) ** 3
 
