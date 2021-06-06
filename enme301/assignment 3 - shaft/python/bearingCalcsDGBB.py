@@ -15,7 +15,7 @@ C = 276 # basic dynamic load rating C
 C0 = 285 # basic static load rating C0
 
 # calculation factor for finding e, X, and Y
-calc_factor = f0 * Fa / C0
+calc_factor = (f0 * Fa) / C0
 
 # from calc factor and tables
 e = 0.26 # load ratio factor
