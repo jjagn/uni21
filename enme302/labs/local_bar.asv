@@ -1,0 +1,6 @@
+function [K_Stiffness_Vector] = local_bar(E,A,L)
+% returns stiffness vector 
+%   Detailed explanation goes here
+K_stiffness_vector = E*A/L * [1 -1; -1 1]
+end
+
