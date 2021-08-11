@@ -21,8 +21,9 @@ undeflected_YG = linspace(node1YG, node2YG, n);
 deflected_XG = undeflected_XG + magFactor .* deflections_XG;
 deflected_YG = undeflected_YG + magFactor .* deflections_YG;
 
-plot(undeflected_XG, undeflected_YG, 'b.-')
+plot(undeflected_XG, undeflected_YG, 'b-')
 hold on
-plot(deflected_XG, deflected_YG, 'r.-')
+plot(deflected_XG, deflected_YG, 'r-')
+legend('original shape', 'deflected shape')
 end
 
