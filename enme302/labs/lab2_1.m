@@ -58,6 +58,12 @@ f2 = K2 * d2
 F1 = lambda1' * f1
 F2 = lambda2' * f2
 
-plot_deflected_shape(0, 10, 0, 0, d1, magFactor, n, L, -90)
+figure(1)
+plotDeflectedShape(0, 10, 0, 0, d1, magFactor, n, L, -90)
 hold on
-plot_deflected_shape(0, 0, 10, 0, d2, magFactor, n, L, 0)
+plotDeflectedShape(0, 0, 10, 0, d2, magFactor, n, L, 0)
+
+figure(2)
+plotDeflectedShapeModified(0, 10, d1, magFactor, n, L, -90)
+hold on
+plotDeflectedShapeModified(0, 0, d2, magFactor, n, L, 0)

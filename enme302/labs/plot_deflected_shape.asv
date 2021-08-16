@@ -1,5 +1,7 @@
 function plot_deflected_shape(node1XG, node1YG, node2XG, node2YG, d_e, magFactor, n, L, alpha)
 % plots deflected shape of beam using shape functions
+
+
 x_e = linspace(0, L, n);
 phi_1 = 1 - x_e ./ L;
 phi_2 = x_e ./ L;

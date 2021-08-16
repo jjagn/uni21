@@ -47,12 +47,23 @@ K_G_3 = A3 * K3hat * A3'
 K_G = K_G_1 + K_G_2 + K_G_3
  
  
+% external reactions
+Q = [10;...
+     0;...
+     0;...
+     10;...
+     0;...
+     0] * 10^3;
+ 
+ 
 % equivalent nodal loads
-f_eq_1 = addTransverseLVL(313920, L2)
-
+f_eq_1 = addTransverseUDL(-10*10^3, L2)
+f_eq_2 = addTransversePointLoad(-50*10^3, L2, L2/2)
 F_eq_1 = lambda2' * f_eq_1
-
+F_eq_2 = lambda2' * f_eq_2
 Q_UDL = A2 * F_eq_1
+Q_PL = A2 * F_eq_2
+Q_total = Q + Q_UDL + Q_PL
 
 
 q = K_G\Q_total
