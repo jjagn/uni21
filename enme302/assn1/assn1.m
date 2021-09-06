@@ -1,90 +1,402 @@
-% ENME302 assignment 1
+%=========================================================================%
+% ENME302 assignment 1 - Jackson Crawford
 clear
 close all
 clc
+%=========================================================================%
 
-% constants, material properties, values
+
+%=========================================================================%
+% settings
+printDeflections =              1;     % q
+printElementForcingVectors =    1;     % f
+printGlobalForcingVectors =     1;     % F
+printElementDisplacements =     1;     % d
+printGlobalDisplacements =      1;     % D
+
+printStrain =                   1;
+printStress =                   1;
+plotSketch =                    1;
+
+spacerString = "==========================================================";
+%=========================================================================%
+
+
+%=========================================================================%
+% INPUT VARIABLES
 E = 200 * 10^9;         % elastic modulus, Pa
-L1 = 4.5;               % frame 1 length, m
-L2 = 4.5;               % frame 2 length, m
-L3 = 3;                 % frame 3 length, m
-A = 5*10^-4;            % frame area, m^2
-I = 1*10^-5;            % frame area moment, m^4
-alpha1 = 90;            % angle of frame 1
-alpha2 = 0;             % angle of frame 2
-alpha3 = -90;           % angle of frame 3
+
+L1 = 1392.04 / 1000;    % bar 1 length, m
+L2 = L1;                % bar 2 length, m
+L3 = L1;                % bar 3 length, m
+L4 = 1554.92 / 1000;    % bar 4 length, m
+L5 = 1041.36 / 1000;    % bar 5 length, m
+L6 = 777.460 / 1000;    % bar 6 length, m
+L7 = 2;                 % bar 7 length, m
+L8 = 2;                 % bar 8 length, m
+
+D = 0.05;               % major diameter of hollow circular bar
+d = 0.038;              % minor diameter of hollow circular bar
+I = pi*(D^4-d^4)/64;    % bar area moment, m^4
+A = pi*D^2/4;           % bar area, m^2
+
+alpha1 = 16.7;          % angle of frame 1
+alpha2 = alpha1;        % angle of frame 2
+alpha3 = alpha1;        % angle of frame 3
+alpha4 = -30.97;        % 
+alpha5 = 50.18;         %
+alpha6 = -30.99;        %
+alpha7 = 0;             %
+alpha8 = 0;             %
 
 magFactor = 30;
 n = 50;
 
+%=========================================================================%
 
+
+%=========================================================================%
+% CALCULATIONS
+%=========================================================================%
 % element 1
-K1 = local_frame(E,I,A,L1)
-[K1hat, lambda1] = global_frame(K1, alpha1)
+K1 = local_bar(E,A,L1);
+[K1hat, lambda1] = global_bar(K1, alpha1);
 
 % element 2
-K2 = local_frame(E,I,A,L2)
-[K2hat, lambda2] = global_frame(K2, alpha2)
+K2 = local_bar(E,A,L2);
+[K2hat, lambda2] = global_bar(K2, alpha2);
 
-% element 2
-K3 = local_frame(E,I,A,L3)
-[K3hat, lambda3] = global_frame(K3, alpha3)
+% element 3
+K3 = local_bar(E,A,L3);
+[K3hat, lambda3] = global_bar(K3, alpha3);
 
-% assembly matrices
+% element 4
+K4 = local_bar(E,A,L4);
+[K4hat, lambda4] = global_bar(K4, alpha4);
 
-A1 = [zeros(3) eye(3); zeros(3, 6)]
+% element 5
+K5 = local_bar(E,A,L5);
+[K5hat, lambda5] = global_bar(K5, alpha5);
 
-A2 = eye(6)
+% element 6
+K6 = local_bar(E,A,L6);
+[K6hat, lambda6] = global_bar(K6, alpha6);
 
-A3 = [zeros(3, 6); eye(3) zeros(3)]
-        
+% element 7
+K7 = local_bar(E,A,L7);
+[K7hat, lambda7] = global_bar(K7, alpha7);
 
-% finding K_G
-K_G_1 = A1 * K1hat * A1'
-K_G_2 = A2 * K2hat * A2'
-K_G_3 = A3 * K3hat * A3'
-
-K_G = K_G_1 + K_G_2 + K_G_3
- 
- 
-% external reactions
-Q = [10;...
-     0;...
-     0;...
-     10;...
-     0;...
-     0] * 10^3;
- 
- 
-% equivalent nodal loads
-f_eq_1 = addTransverseUDL(-10*10^3, L2)
-f_eq_2 = addTransversePointLoad(-50*10^3, L2, L2/2)
-F_eq_1 = lambda2' * f_eq_1
-F_eq_2 = lambda2' * f_eq_2
-Q_UDL = A2 * F_eq_1
-Q_PL = A2 * F_eq_2
-Q_total = Q + Q_UDL + Q_PL
+% element 8
+K8 = local_bar(E,A,L8);
+[K8hat, lambda8] = global_bar(K8, alpha8);
+%=========================================================================%
 
 
-q = K_G\Q_total
+%=========================================================================%
+% ASSEMBLY MATRICES
+A1 = [zeros(2) eye(2);
+      zeros(6, 4)];
 
-D1 = A1' * q
-D2 = A2' * q
-D3 = A3' * q
+A2 = [eye(4);
+      zeros(4)];
+  
+A3 = [zeros(2, 4);
+      eye(4);
+      zeros(2, 4)];
+  
+A4 = A1;
 
-d1 = lambda1 * D1
-d2 = lambda2 * D2
-d3 = lambda3 * D3
+A5 = [eye(2) zeros(2);
+      zeros(4, 4);
+      zeros(2) eye(2)];
+  
+A6 = [zeros(2, 4);
+      zeros(2) eye(2);
+      zeros(2, 4);
+      eye(2) zeros(2)];
+  
+A7 = [zeros(6, 4);
+      zeros(2) eye(2)];
+  
+A8 = [zeros(4);
+      zeros(2) eye(2);
+      eye(2) zeros(2)];
+  
 
-f1 = K1 * d1
-f2 = K2 * d2
-f3 = K3 * d3
+%=========================================================================%
 
-F1 = lambda1' * f1
-F2 = lambda2' * f2
-F3 = lambda3' * f3
 
-plot_deflected_shape(0, 0, 0, L1, d1, magFactor, n, L1, alpha1)
-hold on
-plot_deflected_shape(0, L2, L1, L1, d2, magFactor, n, L2, alpha2)
-plot_deflected_shape(L2, L2, L1, 0, d3, magFactor, n, L3, alpha3)
+%=========================================================================%
+% FINDING K_G
+K_G_1 = A1 * K1hat * A1';
+K_G_2 = A2 * K2hat * A2';
+K_G_3 = A3 * K3hat * A3';
+K_G_4 = A4 * K4hat * A4';
+K_G_5 = A5 * K5hat * A5';
+K_G_6 = A6 * K5hat * A6';
+K_G_7 = A7 * K7hat * A7';
+K_G_8 = A8 * K8hat * A8';
+
+K_G = K_G_1 + K_G_2 + K_G_3 + K_G_4 + K_G_5 + K_G_6 + K_G_7 + K_G_8;
+%=========================================================================%
+
+%=========================================================================%
+% SOLVING SYSTEM FOR OVERALL DEFLECTIONS
+
+f_eq_1 = addTransverseUDL(-2000, 3);
+
+F_eq_1 = lambda1' * f_eq_1;
+
+Q_UDL = A1 * F_eq_1;
+
+Q_cable = 6e3 .*...
+    [0;
+     0;
+     0;
+     cosd(-35);
+     sind(-35);
+     0]
+
+Qtotal = Q_UDL + Q_cable
+
+q = K_G\Qtotal;
+
+if printDeflections
+    format long
+    fprintf("q =\n")
+    disp(q)
+    format short
+else
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying q, overall deflections\n")
+
+end
+%=========================================================================%
+
+
+%=========================================================================%
+% element nodal displacements, global coords
+
+D1 = A1' * q;
+D2 = A2' * q;
+% D3 = A3' * q;
+% D4 = A4' * q;
+
+if printGlobalDisplacements
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("D, nodal displacements in global coords\n")
+    fprintf("%s\n", spacerString)
+    fprintf("D1 =\n")
+    disp(D1)
+    fprintf("D2 =\n")
+    disp(D2)
+%     fprintf("D3 =\n")
+%     disp(D3)
+%     fprintf("D4 =\n")
+%     disp(D4)
+
+else
+    
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying D, nodal displacements in global coords\n")
+
+end
+%=========================================================================%
+
+
+%=========================================================================%
+% element nodal displacements, local coords
+
+d1 = lambda1 * D1;
+d2 = lambda2 * D2;
+% d3 = lambda3 * D3;
+% d4 = lambda4 * D4;
+
+if printElementDisplacements
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("d, nodal displacements in element coords\n")
+    fprintf("%s\n", spacerString)
+    
+    fprintf("d1 =\n")
+    disp(d1)
+    fprintf("d2 =\n")
+    disp(d2)
+%     fprintf("d3 =\n")
+%     disp(d3)
+%     fprintf("d4 =\n")
+%     disp(d4)
+    
+
+else
+    
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying d, nodal displacements in element coords\n")
+
+end
+%=========================================================================%
+
+
+%=========================================================================%
+% Element forcing vectors
+
+f1 = K1 * d1;
+f2 = K2 * d2;
+% f3 = K3 * d3;
+% f4 = K4 * d4;
+
+if printElementForcingVectors
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("f, forcing vectors in element coords\n")
+    fprintf("%s\n", spacerString)
+    
+    fprintf("f1 =\n")
+    disp(f1)
+    fprintf("f2 =\n")
+    disp(f2)
+%     fprintf("f3 =\n")
+%     disp(f3)
+%     fprintf("f4 =\n")
+%     disp(f4)
+
+
+else
+    
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying f, element forcing vectors in element coords\n")
+
+end
+%=========================================================================%
+
+
+%=========================================================================%
+% Global forcing vectors
+
+F1 = lambda1' * f1;
+F2 = lambda2' * f2;
+% F3 = lambda3' * f3;
+% F4 = lambda4' * f4;
+
+if printGlobalForcingVectors
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("F, forcing vectors in global coords\n")
+    fprintf("%s\n", spacerString)
+    
+    fprintf("F1 =\n")
+    disp(F1)
+    fprintf("F2 =\n")
+    disp(F2)
+%     fprintf("F3 =\n")
+%     disp(F3)
+%     fprintf("F4 =\n")
+%     disp(F4)
+
+
+else
+    
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying F, element forcing vectors in global coords\n")
+
+end
+%=========================================================================%
+
+
+%=========================================================================%
+% axial stress
+if printStress
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    m1AxialLoadkN = f2(1) / 1000;
+    m1AxialStress = f2(1) / A;
+    m1AxialStressMPa = m1AxialStress *1e-6;
+    if m1AxialLoadkN > 0
+        fprintf("member 2 in compression, %.4fkN\n", m1AxialLoadkN)
+        fprintf("axial stress = %.4fMPa\n", m1AxialStressMPa)
+    elseif m1AxialLoadkN < 0 
+        fprintf("member 2 in tension, %.4fkN\n", m1AxialLoadkN)
+        fprintf("axial stress = %.4fMPa\n", m1AxialStressMPa)
+    else 
+        fprintf("member 2 under no axial load\n")
+    end
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+else
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying stresses\n")
+
+end
+%=========================================================================%
+
+
+%=========================================================================%
+% axial strain
+if printStrain
+    eps1 = (d1(1) - d1(4))/L1
+    eps2 = (d2(1) - d2(4))/L2
+%     eps3 = (d3(1) - d3(4))/L3
+%     eps4 = (d4(1) - d4(4))/L4
+else
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not displaying strains\n")
+    fprintf("%s\n", spacerString)
+end
+% ==========================================================
+
+
+% ==========================================================
+if plotSketch
+    % sketching calculations
+    e1originX = 0;
+    e1originY = 1.2;
+
+    e2originX = e1originX + L1*cosd(alpha1);
+    e2originY = e1originY + L1*sind(alpha1);
+
+    e3originX = e2originX + L2*cosd(alpha2);
+    e3originY = e2originY + L2*sind(alpha2);
+
+    e4originX = 0;
+    e4originY = 0;
+    
+    e5originX = e4originX + L4*cosd(alpha4);
+    e5originY = e4originY + L4*sind(alpha4);
+    
+    e6originX = e5originX + L5*cosd(alpha5);
+    e6originY = e6originY + L5*sind(alpha5);
+    
+    e7originX = 0;
+    e7originY = 0;
+    
+    e8originX = e7originX + L7*cosd(alpha7);
+    e8originy = e7originY + L7*sind(alpha7);
+
+    % plotting sketch
+    plotDeflectedShapeModified(e1originX, e1originY, d1, magFactor, n, L1, alpha1)
+    hold on
+    plotDeflectedShapeModified(e2originX, e2originY, d2, magFactor, n, L2, alpha2)
+    plotDeflectedShapeModified(e3originX, e3originY, d3, magFactor, n, L3, alpha3)
+    plotDeflectedShapeModified(e4originX, e4originY, d4, magFactor, n, L4, alpha4)
+    plotDeflectedShapeModified(e5originX, e5originY, d5, magFactor, n, L5, alpha5)
+    plotDeflectedShapeModified(e6originX, e6originY, d6, magFactor, n, L6, alpha6)
+    plotDeflectedShapeModified(e7originX, e7originY, d7, magFactor, n, L7, alpha7)
+    plotDeflectedShapeModified(e8originX, e8originY, d8, magFactor, n, L8, alpha8)
+
+    axis equal
+else
+    fprintf("\n")
+    fprintf("%s\n", spacerString)
+    fprintf("not plotting sketch\n")
+    fprintf("%s\n", spacerString)
+end
+% ==========================================================
+
