@@ -35,15 +35,6 @@ L6 = 777.460 / 1000;    % bar 6 length, m
 L7 = 2;                 % bar 7 length, m
 L8 = 2;                 % bar 8 length, m
 
-Ls = L1;
-Ls(:,:,2) = L2;
-Ls(:,:,3) = L3;
-Ls(:,:,4) = L4;
-Ls(:,:,5) = L5;
-Ls(:,:,6) = L6;
-Ls(:,:,7) = L7;
-Ls(:,:,8) = L8;
-
 D = 0.05;               % major diameter of hollow circular bar
 d = 0.038;              % minor diameter of hollow circular bar
 I = pi*(D^4-d^4)/64;    % bar area moment, m^4
@@ -57,15 +48,6 @@ alpha5 = -50.18;         %
 alpha6 = 30.99;        %
 alpha7 = 0;             %
 alpha8 = 0;             %
-
-alphas = alpha1;
-alphas(:,:,2) = alpha2;
-alphas(:,:,3) = alpha3;
-alphas(:,:,4) = alpha4;
-alphas(:,:,5) = alpha5;
-alphas(:,:,6) = alpha6;
-alphas(:,:,7) = alpha7;
-alphas(:,:,8) = alpha8;
 
 
 n_elements = 8;
@@ -348,18 +330,17 @@ if printStress
     fprintf("\n")
     fprintf("%s\n", spacerString)
     for i = 1:n_elements
-        f = fs(:,:,i);
-        AxialLoadkN = f(1)/ 1000;
-        AxialStress = f(1) / A; % DID NOT HAVE TO VECTORISE A AS ALL HAVE SAME AREA
+        AxialLoadkN = fs(:,:,i) / 1000;
+        AxialStress = fs(:,:,i) / As(:,:,i);
         AxialStressMPa = AxialStress *1e-6;
         if AxialLoadkN > 0
-            fprintf("member %d in compression, %.4fkN\n", i, AxialLoadkN)
+            fprintf("member 2 in compression, %.4fkN\n", AxialLoadkN)
             fprintf("axial stress = %.4fMPa\n", AxialStressMPa)
         elseif AxialLoadkN < 0 
-            fprintf("member %d in tension, %.4fkN\n", i, AxialLoadkN)
+            fprintf("member 2 in tension, %.4fkN\n", AxialLoadkN)
             fprintf("axial stress = %.4fMPa\n", AxialStressMPa)
         else 
-            fprintf("member %d under no axial load\n", i)
+            fprintf("member 2 under no axial load\n")
         end
         fprintf("\n")
         fprintf("%s\n", spacerString)
@@ -376,13 +357,14 @@ end
 %=========================================================================%
 % axial strain
 if printStrain
-    
-    epss = zeros(1, 1, n_elements);
-    for i = 1:n_elements
-        d = ds(:,:,i);
-        L = Ls(:,:,i);
-        epss(:,:,i) = d(1) - d(2)/L;
-    end
+    eps1 = (d1(1) - d1(2))/L1
+    eps2 = (d2(1) - d2(2))/L2
+    eps3 = (d3(1) - d3(2))/L3
+    eps4 = (d4(1) - d4(2))/L4
+    eps5 = (d5(1) - d5(2))/L5
+    eps6 = (d6(1) - d6(2))/L6
+    eps7 = (d7(1) - d7(2))/L7
+    eps8 = (d8(1) - d8(2))/L8
 else
     fprintf("\n")
     fprintf("%s\n", spacerString)
@@ -419,30 +401,17 @@ if plotSketch
     e8originX = e7originX + L7*cosd(alpha7);
     e8originY = e7originY + L7*sind(alpha7);
 
-    Xorigins = e1originX;
-    Xorigins(:,:,2) = e2originX;
-    Xorigins(:,:,3) = e3originX;
-    Xorigins(:,:,4) = e4originX;
-    Xorigins(:,:,5) = e5originX;
-    Xorigins(:,:,6) = e6originX;
-    Xorigins(:,:,7) = e7originX;
-    Xorigins(:,:,8) = e8originX;
-
-    Yorigins = e1originY;
-    Yorigins(:,:,2) = e2originY;
-    Yorigins(:,:,3) = e3originY;
-    Yorigins(:,:,4) = e4originY;
-    Yorigins(:,:,5) = e5originY;
-    Yorigins(:,:,6) = e6originY;
-    Yorigins(:,:,7) = e7originY;
-    Yorigins(:,:,8) = e8originY;
-
     % plotting sketch
-    for i = 1:n_elements
-    plotDeflectedBar(Xorigins(:,:,i), Yorigins(:,:,i), Ds(:,:,i), magFactor, n, Ls(:,:,i), alphas(:,:,i))
+    plotDeflectedBar(e1originX, e1originY, Ds(:,:,1), magFactor, n, L1, alpha1)
     hold on
-    end
-    
+    plotDeflectedBar(e2originX, e2originY, Ds(:,:,2), magFactor, n, L2, alpha2)
+    plotDeflectedBar(e3originX, e3originY, Ds(:,:,3), magFactor, n, L3, alpha3)
+    plotDeflectedBar(e4originX, e4originY, Ds(:,:,4), magFactor, n, L4, alpha4)
+    plotDeflectedBar(e5originX, e5originY, Ds(:,:,5), magFactor, n, L5, alpha5)
+    plotDeflectedBar(e6originX, e6originY, Ds(:,:,6), magFactor, n, L6, alpha6)
+    plotDeflectedBar(e7originX, e7originY, Ds(:,:,7), magFactor, n, L7, alpha7)
+    plotDeflectedBar(e8originX, e8originY, Ds(:,:,8), magFactor, n, L8, alpha8)
+
     axis equal
 else
     fprintf("\n")

@@ -60,16 +60,16 @@ eps2 = (d2(1) - d2(2))/(L2)
 f1 = K1 * d1
 f2 = K2 * d2
 
-% % plot system
-% figure(1)
-% 
-% mag_factor = 1000; % magnification factor for displacements
-% % original structure
-% line([0, 10], [0, 10], 'Color', 'black')
-% line([0, 10], [10, 10], 'Color', 'black')
-% 
-% % displaced structure
-% title('FEA result')
-% line([0, 10 + mag_factor * q(1)], [10, 10 + mag_factor * q(2)], 'Color', 'red', 'LineStyle', '-')
-% line([0, 10 + mag_factor * q(1)], [0, 10 + mag_factor * q(2)], 'Color', 'red', 'LineStyle', '-')
-% legend('original lmnt 1', 'original lmnt 2', 'disp. lmnt 1', 'disp. lmnt 2')
+% plot system
+figure(1)
+
+mag_factor = 1000; % magnification factor for displacements
+% original structure
+line([0, 10], [0, 10], 'Color', 'black')
+line([0, 10], [10, 10], 'Color', 'black')
+
+% displaced structure
+title('FEA result')
+line([0, 10 + mag_factor * q(1)], [10, 10 + mag_factor * q(2)], 'Color', 'red', 'LineStyle', '-')
+line([0, 10 + mag_factor * q(1)], [0, 10 + mag_factor * q(2)], 'Color', 'red', 'LineStyle', '-')
+legend('original lmnt 1', 'original lmnt 2', 'disp. lmnt 1', 'disp. lmnt 2')
