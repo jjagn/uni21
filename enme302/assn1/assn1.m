@@ -47,14 +47,14 @@ Ls(:,:,8) = L8;
 D = 0.05;               % major diameter of hollow circular bar
 d = 0.038;              % minor diameter of hollow circular bar
 I = pi*(D^4-d^4)/64;    % bar area moment, m^4
-A = pi*D^2/4;           % bar area, m^2
+A = (pi*D^2)/4-(pi*d^2)/4;           % bar area, m^2
 
-alpha1 = -16.7;          % angle of frame 1
+alpha1 = -16.7;         % angle of frame 1
 alpha2 = alpha1;        % angle of frame 2
 alpha3 = alpha1;        % angle of frame 3
-alpha4 = 30.97;        % 
-alpha5 = -50.18;         %
-alpha6 = 30.99;        %
+alpha4 = 30.97;         % 
+alpha5 = -50.18;        %
+alpha6 = 30.99;         %
 alpha7 = 0;             %
 alpha8 = 0;             %
 
@@ -178,7 +178,7 @@ K_G_2 = A2 * K2hat * A2';
 K_G_3 = A3 * K3hat * A3';
 K_G_4 = A4 * K4hat * A4';
 K_G_5 = A5 * K5hat * A5';
-K_G_6 = A6 * K5hat * A6';
+K_G_6 = A6 * K6hat * A6';
 K_G_7 = A7 * K7hat * A7';
 K_G_8 = A8 * K8hat * A8';
 
@@ -224,9 +224,10 @@ if printGlobalDisplacements
     fprintf("%s\n", spacerString)
     fprintf("D, nodal displacements in global coords\n")
     fprintf("%s\n", spacerString)
+    
     for i = 1:n_elements
-    fprintf("D%d =\n", i)
-    disp(Ds(:,:,i))
+        fprintf("D%d =\n", i)
+        disp(Ds(:,:,i))
     end
 
 else
@@ -261,13 +262,11 @@ if printElementDisplacements
     fprintf("d, nodal displacements in element coords\n")
     fprintf("%s\n", spacerString)
     for i = 1:n_elements
-    fprintf("d%d =\n", i)
-    disp(ds(:,:,i))
+        fprintf("d%d =\n", i)
+        disp(ds(:,:,i))
     end
     
-
 else
-    
     fprintf("\n")
     fprintf("%s\n", spacerString)
     fprintf("not displaying d, nodal displacements in element coords\n")
@@ -299,8 +298,8 @@ if printElementForcingVectors
     fprintf("%s\n", spacerString)
     
     for i = 1:n_elements
-    fprintf("f%d =\n", i)
-    disp(fs(:,:,i))
+        fprintf("f%d =\n", i)
+        disp(fs(:,:,i))
     end
 
 
@@ -327,8 +326,8 @@ if printGlobalForcingVectors
     fprintf("%s\n", spacerString)
     
     for i = 1:n_elements
-    fprintf("F%d =\n", i)
-    disp(Fs(:,:,i))
+        fprintf("F%d =\n", i)
+        disp(Fs(:,:,i))
     end
 
 
@@ -439,8 +438,8 @@ if plotSketch
 
     % plotting sketch
     for i = 1:n_elements
-    plotDeflectedBar(Xorigins(:,:,i), Yorigins(:,:,i), Ds(:,:,i), magFactor, n, Ls(:,:,i), alphas(:,:,i))
-    hold on
+        plotDeflectedBar(Xorigins(:,:,i), Yorigins(:,:,i), Ds(:,:,i), magFactor, n, Ls(:,:,i), alphas(:,:,i))
+        hold on
     end
     
     axis equal

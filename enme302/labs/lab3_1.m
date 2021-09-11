@@ -88,3 +88,9 @@ plot_deflected_shape(0, 0, 0, L1, d1, magFactor, n, L1, alpha1)
 hold on
 plot_deflected_shape(0, L2, L1, L1, d2, magFactor, n, L2, alpha2)
 plot_deflected_shape(L2, L2, L1, 0, d3, magFactor, n, L3, alpha3)
+
+figure(2)
+plotDeflectedShapeModified(0, 0, d1, magFactor, n, L1, alpha1)
+hold on
+plotDeflectedShapeModified(0, L1, d2, magFactor, n, L2, alpha2)
+plotDeflectedShapeModified(L2, L1, d3, magFactor, n, L3, alpha3)
