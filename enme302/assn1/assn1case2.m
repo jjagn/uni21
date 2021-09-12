@@ -44,8 +44,8 @@ Ls(:,:,6) = L6;
 Ls(:,:,7) = L7;
 Ls(:,:,8) = L8;
 
-D = 0.05;               % major diameter of hollow circular bar
-d = 0.038;              % minor diameter of hollow circular bar
+D = 0.1;               % major diameter of hollow circular bar
+d = 0.08;              % minor diameter of hollow circular bar
 I = pi*(D^4-d^4)/64;    % bar area moment, m^4
 A = (pi*D^2)/4-(pi*d^2)/4;           % bar area, m^2
 
