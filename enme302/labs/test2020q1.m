@@ -9,13 +9,13 @@ clc
 %=========================================================================%
 % settings
 printDeflections =              1;     % q
-printElementForcingVectors =    1;     % f
-printGlobalForcingVectors =     1;     % F
-printElementDisplacements =     1;     % d
-printGlobalDisplacements =      1;     % D
+printElementForcingVectors =    0;     % f
+printGlobalForcingVectors =     0;     % F
+printElementDisplacements =     0;     % d
+printGlobalDisplacements =      0;     % D
 
-printStrain =                   1;
-printStress =                   1;
+printStrain =                   0;
+printStress =                   0;
 plotSketch =                    1;
 
 spacerString = "==========================================================";
@@ -24,11 +24,11 @@ spacerString = "==========================================================";
 
 %=========================================================================%
 % INPUT VARIABLES
-E = 200 * 10^9;         % elastic modulus, Pa
+E = 10 * 10^9;         % elastic modulus, Pa
 
-L1 = 3;    % bar 1 length, m
-L2 = L1;                % bar 2 length, m
-% L3 = L1;                % bar 3 length, m
+L1 = 0.5;    % bar 1 length, m
+L2 = 2;                % bar 2 length, m
+L3 = 2;                % bar 3 length, m
 % L4 = 1554.92 / 1000;    % bar 4 length, m
 % L5 = 1041.36 / 1000;    % bar 5 length, m
 % L6 = 777.460 / 1000;    % bar 6 length, m
@@ -37,7 +37,7 @@ L2 = L1;                % bar 2 length, m
 
 Ls = L1;
 Ls(2) = L2;
-% Ls(3) = L3;
+Ls(3) = L3;
 % Ls(4) = L4;
 % Ls(5) = L5;
 % Ls(6) = L6;
@@ -49,12 +49,12 @@ Ls(2) = L2;
 % I = pi*(D^4-d^4)/64;            % bar area moment, m^4
 % A = (pi*D^2)/4-(pi*d^2)/4;      % bar area, m^2
 
-A = 1*10^-3;            % frame area, m^2
-I = 1*10^-5;            % frame area moment, m^4
+A = 4*10^-4;            % frame area, m^2
+I = 1*10^-6;            % frame area moment, m^4
 
-alpha1 = 0;         % angle of frame 1
-alpha2 = -75;        % angle of frame 2
-% alpha3 = alpha1;        % angle of frame 3
+alpha1 = 90;         % angle of frame 1
+alpha2 = 45;        % angle of frame 2
+alpha3 = -75;        % angle of frame 3
 % alpha4 = 30.97;         % 
 % alpha5 = -50.18;        %
 % alpha6 = 30.99;         %
@@ -63,85 +63,43 @@ alpha2 = -75;        % angle of frame 2
 
 alphas = alpha1;
 alphas(2) = alpha2;
-% alphas(3) = alpha3;
+alphas(3) = alpha3;
 % alphas(4) = alpha4;
 % alphas(5) = alpha5;
 % alphas(6) = alpha6;
 % alphas(7) = alpha7;
 % alphas(8) = alpha8;
 
-n_elements = 2;
-magFactor = 30;
+n_elements = 3;
+magFactor = 1;
 n = 50;
 
 %=========================================================================%
 
 
 %=========================================================================%
-% CALCULATIONS
+% K_G CALCULATIONS
 %=========================================================================%
-% element 1
-K1 = local_frame(E,I,A,L1);
-[K1hat, lambda1] = global_frame(K1, alpha1);
 
-% element 2
-K2 = local_frame(E,I,A,L2);
-[K2hat, lambda2] = global_frame(K2, alpha2);
+for i = 1:n_elements
+Ks(:,:,i) = local_frame(E,I,A,Ls(i));
+[Khats(:,:,i), lambdas(:,:,i)] = global_frame(Ks(:,:,i), alphas(i));
+end
 
-% % element 3
-% K3 = local_frame(E,I,A,L3);
-% [K3hat, lambda3] = global_frame(K3, alpha3);
-% 
-% % element 4
-% K4 = local_frame(E,I,A,L4);
-% [K4hat, lambda4] = global_frame(K4, alpha4);
-% 
-% % element 5
-% K5 = local_frame(E,I,A,L5);
-% [K5hat, lambda5] = global_frame(K5, alpha5);
-% 
-% % element 6
-% K6 = local_frame(E,I,A,L6);
-% [K6hat, lambda6] = global_frame(K6, alpha6);
-% 
-% % element 7
-% K7 = local_frame(E,I,A,L7);
-% [K7hat, lambda7] = global_frame(K7, alpha7);
-% 
-% % element 8
-% K8 = local_frame(E,I,A,L8);
-% [K8hat, lambda8] = global_frame(K8, alpha8);
-
-Ks = K1;
-Ks(:,:,2) = K2;
-% Ks(:,:,3) = K3;
-% Ks(:,:,4) = K4;
-% Ks(:,:,5) = K5;
-% Ks(:,:,6) = K6;
-% Ks(:,:,7) = K7;
-% Ks(:,:,8) = K8;
-
-lambdas = lambda1;
-lambdas(:,:,2) = lambda2;
-% lambdas(:,:,3) = lambda3;
-% lambdas(:,:,4) = lambda4;
-% lambdas(:,:,5) = lambda5;
-% lambdas(:,:,6) = lambda6;
-% lambdas(:,:,7) = lambda7;
-% lambdas(:,:,8) = lambda8;
 %=========================================================================%
 
 
 %=========================================================================%
 % ASSEMBLY MATRICES
-A1 = eye(6)
+A1 = [zeros(3) eye(3); zeros(3,6)]
 
-A2 = [zeros(3, 6);
-    eye(3), zeros(3)]
+A2 = [eye(6)]
+
+A3 = [zeros(3,6); eye(3) zeros(3)]
   
 AssemblyMatrices = A1;
 AssemblyMatrices(:,:,2) = A2;
-% AssemblyMatrices(:,:,3) = A3;
+AssemblyMatrices(:,:,3) = A3;
 % AssemblyMatrices(:,:,4) = A4;
 % AssemblyMatrices(:,:,5) = A5;
 % AssemblyMatrices(:,:,6) = A6;
@@ -152,38 +110,32 @@ AssemblyMatrices(:,:,2) = A2;
 
 %=========================================================================%
 % FINDING K_G
-K_G_1 = A1 * K1hat * A1';
-K_G_2 = A2 * K2hat * A2';
-% K_G_3 = A3 * K3hat * A3';
-% K_G_4 = A4 * K4hat * A4';
-% K_G_5 = A5 * K5hat * A5';
-% K_G_6 = A6 * K6hat * A6';
-% K_G_7 = A7 * K7hat * A7';
-% K_G_8 = A8 * K8hat * A8';
 
-K_G = K_G_1 + K_G_2; % + K_G_3 + K_G_4 + K_G_5 + K_G_6 + K_G_7 + K_G_8;
+K_G = 0;
+for i = 1:n_elements
+K_Gs(:,:,i) = AssemblyMatrices(:,:,i) * Khats(:,:,i) * AssemblyMatrices(:,:,i)';
+K_G = K_G + K_Gs(:,:,i);
+end
+
 %=========================================================================%
 
 %=========================================================================%
 % SOLVING SYSTEM FOR OVERALL DEFLECTIONS
+alpha_load = -80;
+load_intensity = 4000;
+transverse_component = load_intensity *sind(alpha_load)
+axial_component = load_intensity * cosd(alpha_load)
 
-f_eq_1 = addTransverseUDL(-2000, 3);
+f_eq_1 = addTransversePointLoad(transverse_component, L2, 1.5)
 
-F_eq_1 = lambda1' * f_eq_1;
+f_eq_2 = addAxialPointLoad(axial_component, L2, 1.5)
 
-Q_UDL = A1 * F_eq_1;
+F_eq_1 = lambdas(:,:,2)' * f_eq_1;
+F_eq_2 = lambdas(:,:,2)' * f_eq_2;
 
-Q_cable = 6e3 .*...
-    [0;
-     0;
-     0;
-     cosd(-35);
-     sind(-35);
-     0]
+Q = A2 * F_eq_1 + A2 * F_eq_2
 
-Qtotal = Q_UDL + Q_cable
-
-q = K_G\Qtotal;
+q = K_G\Q;
 
 if printDeflections
     format long
@@ -350,11 +302,8 @@ if printStress
         end
         fprintf("\n")
         fprintf("%s\n", spacerString)
-        sum = sum + abs(AxialStressMPa);
         stresses(i) = AxialStressMPa;
     end
-    totalAbsNormalStressMPa = sum;
-    fprintf("total absolute normal stress %.6fMPa\n", totalAbsNormalStressMPa)
 else
     fprintf("\n")
     fprintf("%s\n", spacerString)
@@ -392,8 +341,8 @@ if plotSketch
     e2originX = e1originX + L1*cosd(alpha1);
     e2originY = e1originY + L1*sind(alpha1);
 
-%     e3originX = e2originX + L2*cosd(alpha2);
-%     e3originY = e2originY + L2*sind(alpha2);
+    e3originX = e2originX + L2*cosd(alpha2);
+    e3originY = e2originY + L2*sind(alpha2);
 % 
 %     e4originX = 0;
 %     e4originY = 0;
@@ -412,7 +361,7 @@ if plotSketch
 
     Xorigins = e1originX;
     Xorigins(2) = e2originX;
-%     Xorigins(3) = e3originX;
+    Xorigins(3) = e3originX;
 %     Xorigins(4) = e4originX;
 %     Xorigins(5) = e5originX;
 %     Xorigins(6) = e6originX;
@@ -421,7 +370,7 @@ if plotSketch
 
     Yorigins = e1originY;
     Yorigins(2) = e2originY;
-%     Yorigins(3) = e3originY;
+    Yorigins(3) = e3originY;
 %     Yorigins(4) = e4originY;
 %     Yorigins(5) = e5originY;
 %     Yorigins(6) = e6originY;
@@ -430,8 +379,8 @@ if plotSketch
 
     % plotting sketch
     for i = 1:n_elements
-        plotDeflectedBar(Xorigins(i), Yorigins(i), Ds(:,:,i), magFactor, n, Ls(i), alphas(i))
-        plotDeflectedShapeModified(Xorigins(i), Yorigins(i), d1, magFactor, n, L1, alpha1)
+%         plotDeflectedBar(Xorigins(i), Yorigins(i), Ds(:,:,i), magFactor, n, Ls(i), alphas(i))
+        plotDeflectedShapeModified(Xorigins(i), Yorigins(i), ds(:,:,i), magFactor, n, Ls(i), alphas(i))
         hold on
     end
     
