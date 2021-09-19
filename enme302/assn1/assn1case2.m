@@ -454,3 +454,8 @@ else
     fprintf("%s\n", spacerString)
 end
 % ==========================================================
+
+tipDeflectionX = q(5)*1000  % Deflection of tip in x direction in mm
+tipDeflectionY = q(6)*1000  % Deflection of tip in x direction in mm
+
+
