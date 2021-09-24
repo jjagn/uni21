@@ -23,10 +23,10 @@ spacerString = "==========================================================";
 
 %=========================================================================%
 % INPUT VARIABLES
-E = 30 * 10^9;         % elastic modulus, Pa
+E = 200 * 10^9;         % elastic modulus, Pa
 
-L1 = 3;    % bar 1 length, m
-L2 = 2;                % bar 2 length, m
+L1 = 5;    % bar 1 length, m
+L2 = 4;                % bar 2 length, m
 % L3 = 2;                % bar 3 length, m
 % L4 = 1554.92 / 1000;    % bar 4 length, m
 % L5 = 1041.36 / 1000;    % bar 5 length, m
@@ -48,12 +48,15 @@ Ls(2) = L2;
 % I = pi*(D^4-d^4)/64;            % bar area moment, m^4
 % A = (pi*D^2)/4-(pi*d^2)/4;      % bar area, m^2
 
-A = 2*10^-4;            % frame area, m^2
-I = 6*10^-6;            % frame area moment, m^4
+A = 6*10^-4;            % frame area, m^2
+I1 = 8*10^-6;            % frame area moment, m^4
+I2 = I1;
 
-alpha1 = 90;         % angle of frame 1
-alpha2 = 45;        % angle of frame 2
-alpha3 = -75;        % angle of frame 3
+Is = [I1, I2];
+
+alpha1 = 53.1;         % angle of frame 1
+alpha2 = 270;        % angle of frame 2
+% alpha3 = -75;        % angle of frame 3
 % alpha4 = 30.97;         % 
 % alpha5 = -50.18;        %
 % alpha6 = 30.99;         %
@@ -62,15 +65,15 @@ alpha3 = -75;        % angle of frame 3
 
 alphas = alpha1;
 alphas(2) = alpha2;
-alphas(3) = alpha3;
+% alphas(3) = alpha3;
 % alphas(4) = alpha4;
 % alphas(5) = alpha5;
 % alphas(6) = alpha6;
 % alphas(7) = alpha7;
 % alphas(8) = alpha8;
 
-n_elements = 3;
-magFactor = 1;
+n_elements = 2;
+magFactor = 5;
 n = 51; % odd number so there is an exact middle index
 
 %=========================================================================%
@@ -81,7 +84,7 @@ n = 51; % odd number so there is an exact middle index
 %=========================================================================%
 
 for i = 1:n_elements
-Ks(:,:,i) = local_frame(E,I,A,Ls(i));
+Ks(:,:,i) = local_frame(E,Is(i),A,Ls(i));
 [Khats(:,:,i), lambdas(:,:,i)] = global_frame(Ks(:,:,i), alphas(i));
 end
 
@@ -90,15 +93,13 @@ end
 
 %=========================================================================%
 % ASSEMBLY MATRICES
-A1 = [zeros(3) eye(3); zeros(3,6)]
+A1 = [zeros(3) eye(3)];
 
-A2 = [eye(6)]
-
-A3 = [zeros(3,6); eye(3) zeros(3)]
+A2 = [eye(3) zeros(3)];
   
 AssemblyMatrices = A1;
 AssemblyMatrices(:,:,2) = A2;
-AssemblyMatrices(:,:,3) = A3;
+% AssemblyMatrices(:,:,3) = A3;
 % AssemblyMatrices(:,:,4) = A4;
 % AssemblyMatrices(:,:,5) = A5;
 % AssemblyMatrices(:,:,6) = A6;
@@ -120,19 +121,20 @@ end
 
 %=========================================================================%
 % SOLVING SYSTEM FOR OVERALL DEFLECTIONS
-alpha_load = -80;
-load_intensity = 4000;
-transverse_component = load_intensity *sind(alpha_load)
-axial_component = load_intensity * cosd(alpha_load)
+% alpha_load = -80;
+p = 1000;
+g = -9.81;
+h = 4;
+D = 2;
+load_intensity = p*g*h*D
+% transverse_component = load_intensity *sind(alpha_load)
+% axial_component = load_intensity * cosd(alpha_load)
 
-f_eq_1 = addTransversePointLoad(transverse_component, L2, 1.5)
-
-f_eq_2 = addAxialPointLoad(axial_component, L2, 1.5)
+f_eq_1 = addTransverseLVL(load_intensity, Ls(2))
 
 F_eq_1 = lambdas(:,:,2)' * f_eq_1;
-F_eq_2 = lambdas(:,:,2)' * f_eq_2;
 
-Q = A2 * F_eq_1 + A2 * F_eq_2
+Q = A2 * F_eq_1
 
 q = K_G\Q;
 
@@ -141,6 +143,8 @@ if printDeflections
     fprintf("q =\n")
     disp(q)
     format short
+    fprintf("q (mm/mrad) =\n")
+    disp(q*1000)
 else
     fprintf("\n")
     fprintf("%s\n", spacerString)
