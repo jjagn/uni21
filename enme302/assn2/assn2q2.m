@@ -8,14 +8,14 @@ f = @(x, y) x .* y .* (L-x) .* (H-y);
 g = 0;
 s = 0;
 c = 6;
-n_space = 30; % spatial grid points
+n_space = 100; % spatial grid points
 tn = 300; % number of time points, e.g frames
 desired_fps = 240
 t_f = tn/desired_fps; % end time of sim
 
 % ANALYTICAL SOLUTION
-a_lim = 5;      % number of fourier series terms
-b_lim = 5;      % "" ""
+a_lim = 20;      % number of fourier series terms
+b_lim = 20;      % "" ""
 
 u_a = @(x, y, t) 0;
 
@@ -37,7 +37,7 @@ for i = 1:tn
 end
 
 figure()
-filename = 'analytical_soln_better_fps_2.gif';
+filename = 'analytical_soln_better_fps_3.gif';
 
 for n = 1:tn
     surf(results(:,:,n))
