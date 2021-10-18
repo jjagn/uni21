@@ -7,18 +7,22 @@ H = 3;
 g = 0;
 s = 0;
 c = 6;
-n = 100; % spatial grid points
-grid_size = 1; % physical size of grid
-t_n = 1000; % number of time points
-t_f = 1; % end time of sim
 
 animated_plot = 0;
+plot_at_all = 0;
+lambda = 0.6 % constant courant number
+lambda2 = lambda^2;
+deltas = linspace(0.5, 0.005, 50)
+epss = []
 
-delta = grid_size/n;
-dt = t_f/t_n;
+for delta = deltas
+grid_size = 1; % physical size of grid
+t_f = 0.5; % end time of sim
 
-lambda = c*dt/delta
-lambda2 = lambda*lambda
+n = round(grid_size/delta); % calculating spatial grid points to maintain constant courant number
+
+dt = lambda*delta/c;
+t_n = t_f/dt;
 
 % ANALYTICAL SOLUTION
 a_lim = 5;      % number of fourier series terms
@@ -39,26 +43,29 @@ t = linspace(0,t_f,t_n);
 [X,Y] = meshgrid(x, y);
 
 % loop to set initial conditions
-for i = 1:n*L
-    for j = 1:n*H
+u_initial = [];
+for i = 1:length(x)
+    for j = 1:length(y)
         u_initial(j,i) = x(i).*y(j).*(L-x(i)).*(H-y(j));
     end
 end
 
+results_analytical = [];
 for i = 1:t_n
     results_analytical(:,:,i) = u_a(X, Y, t(i));
 end
 
-figure()
+% figure()
 % surf(u_initial) % display initial conditions for verification
 
 % loop to find solutions, use if statements for boundary conditions
 u_p = u_initial;
 u_c = u_initial;
+results_numerical = [];
 for k = 1:t_n
-    for i = 1:n*L     
-        for j = 1:n*H
-            if i == 1 || j == 1 || i == n*L || j == n*H %% enforcing boundary conditions
+    for i = 1:length(x)     
+        for j = 1:length(y)
+            if i == 1 || j == 1 || i == length(x)  || j == length(y)  %% enforcing boundary conditions
                 u_n(j,i) = 0;
             else
                 u_n(j,i) = 2*(1-2*lambda2)*u_c(j,i) + lambda2*(u_c(j+1,i) + u_c(j-1,i) + u_c(j,i+1) + u_c(j,i-1)) - u_p(j,i);
@@ -70,8 +77,9 @@ for k = 1:t_n
     results_numerical(:,:,k) = u_n;
 end
 
-figure()
 
+if plot_at_all
+    figure()
 if animated_plot
     for time = 1:t_n
         subplot(1,2,1)
@@ -87,13 +95,13 @@ if animated_plot
 end
 
 figure()
-colour = 0;
-num_plots = 10;
+colour = 0
+num_plots = 10
 for time = 1:t_n/num_plots:t_n
-    formatspec = 't = %.2f s';
-    legendstr = sprintf(formatspec, time);
+    formatspec = 't = %.2f s'
+    legendstr = sprintf(formatspec, time)
     plot(results_numerical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
-    colour = colour + 1/num_plots;
+    colour = colour + 1/num_plots
     hold on
     legend
 end
@@ -101,17 +109,28 @@ title("u(x, H/2, t) for various times, numerical solution")
 
 figure()
 
-colour = 0;
-num_plots = 10;
+colour = 0
+num_plots = 10
 for time = 1:t_n/num_plots:t_n
-    formatspec = 't = %.2f s';
-    legendstr = sprintf(formatspec, time);
-    plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
-    colour = colour + 1/num_plots;
+    formatspec = 't = %.2f s'
+    legendstr = sprintf(formatspec, time)
+    plot(results_numerical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
+    colour = colour + 1/num_plots
     hold on
     legend
 end
 
 title("u(x, H/2, t) for various times, analytical solution")
+end
 
-
+% looping to calculate epsilon
+sum = 0;
+for i = 1:length(x)   
+    for j = 1:length(y)
+        sum = sum + ((results_numerical(j, i, end)) - results_analytical(j, i, end))^2;       
+    end
+end
+eps = sqrt(delta^2*sum);
+epss = [epss eps];
+end
+plot(deltas, epss)
