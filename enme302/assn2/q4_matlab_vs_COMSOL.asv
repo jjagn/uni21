@@ -7,18 +7,18 @@ H = 3;
 u_e = @(x, y, t) x.*(L-x).*y.*(H-y).*(1+1/2.*t);
 
 c = 6;
-g = @(x, y, t) 0.5 .* u_e(x, y, t);
-s = @(x, y, t) 2.*c^2 .* (1 + 0.5.*t) .* (y .* (H-y) + x .* (L-x)); 
+g = 0;
+s = 0;
 
 lambda = 0.6; % constant courant number
 lambda2 = lambda^2;
 
-delta = 0.01;
+delta = 0.1;
 
 animated_plot = 0;
 
 grid_size = 1; % physical size of grid
-t_f = 2; % end time of sim
+t_f = 1; % end time of sim
 
 n = round(grid_size/delta); % calculating spatial grid points to maintain constant courant number
 
@@ -44,9 +44,9 @@ end
 % loop to find solutions, use if statements for boundary conditions
 u_c = u_initial;
 for k = 1:t_n
-    for i = 1:n*L     
-        for j = 1:n*H
-            if i == 1 || j == 1 || i == n*L || j == n*H %% enforcing boundary conditions
+    for i = 1:length(x)-1    
+        for j = 1:length(y)-1
+            if i == 1 || j == 1 || i == length(x) || j == length(y) %% enforcing boundary conditions
                 u_n(j,i) = 0;
             else
                 if k == 1 % implementing special case for first time step, using ghost node to implement V.N. B.C.
@@ -62,19 +62,19 @@ for k = 1:t_n
     results_numerical(:,:,k) = u_n;
 end
 
-% figure()
-% 
-% for time = 1:t_n
-%     subplot(1,2,1)
-%     surf(results_numerical(:,:,time));
-%     axis([0 n*L 0 n*H -2.5 2.5]);
-%     title('numerical solution')
-%     subplot(1,2,2)
-%     surf(results_analytical(:,:,time));
-%     axis([0 n*L 0 n*H -2.5 2.5]);
-%     title('analytical solution')
-%     pause(1/60)
-% end
+figure()
+
+for time = 1:t_n
+    subplot(1,2,1)
+    surf(results_numerical(:,:,time));
+    axis([0 n*L 0 n*H -2.5 2.5]);
+    title('numerical solution')
+    subplot(1,2,2)
+    surf(results_analytical(:,:,time));
+    axis([0 n*L 0 n*H -2.5 2.5]);
+    title('analytical solution')
+    pause(1/60)
+end
 
 figure()
 results = []

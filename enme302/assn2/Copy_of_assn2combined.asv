@@ -10,15 +10,15 @@ c = 6;
 g = @(x, y, t) 0.5 .* u_e(x, y, t);
 s = @(x, y, t) 2.*c^2 .* (1 + 0.5.*t) .* (y .* (H-y) + x .* (L-x)); 
 
-lambda = 0.6; % constant courant number
+lambda = 0.6 % constant courant number
 lambda2 = lambda^2;
 
-delta = 0.01;
+delta = 0.05
 
 animated_plot = 0;
 
 grid_size = 1; % physical size of grid
-t_f = 2; % end time of sim
+t_f = 0.5; % end time of sim
 
 n = round(grid_size/delta); % calculating spatial grid points to maintain constant courant number
 
