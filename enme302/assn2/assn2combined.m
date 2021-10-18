@@ -113,5 +113,3 @@ for time = 1:t_n/num_plots:t_n
 end
 
 title("u(x, H/2, t) for various times, analytical solution")
-
-
