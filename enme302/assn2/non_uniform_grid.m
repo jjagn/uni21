@@ -1,21 +1,23 @@
 clear; close all; clc
 
-f = @(x, y) 5*normpdf(x,0,1);        % function for determining initial conditions
-c = @(x, y) 5;       % function for determining variable wave speed
-t_final = 2;            % [s], length over which simulation is run
-time_points  = 1000;     % number of time points to iterate over
+f = @(x, y) sin(x/2)+0.1;        % function for determining initial conditions
+c = @(x, y) x^2 + 1;       % function for determining variable wave speed
+t_final = 5;            % [s], length over which simulation is run
+time_points = 1000;     % number of time points to iterate over
 n = 10;                 % number of grid points
-
 
 delta_t = t_final/time_points;  % [s], resulting time step for simulation
 
 L = 2;                          % [m], x dimension of simulation space
 H = 3;                          % [m], y dimension of simulation space
+alpha = 0.3;
 
 % PLACEHOLDER PENDING PROPER DISCRETISATION CODE
-x = linspace(0,L,n*L);                      % vector of grid points in x
-y = linspace(0,H,n*H);                      % vector of grid points in y
+x = generate_grid(L, n*L, alpha);           % vector of grid points in x
+y = generate_grid(H, n*H, alpha);           % vector of grid points in y
 t = linspace(0,t_final,time_points);        % vector of time points
+
+[X,Y] = meshgrid(x, y);
 
 
 % NUMERICAL DISCRETISED SOLUTION
@@ -42,12 +44,27 @@ for k = 1:time_points
     end
 end
 figure(1)
-surf(u(:,:,1))
+surf(X, Y, u(:,:,1))
 
 figure(2)
 for i = 1:length(t)
     % s = surf(u(:,:,i), 'FaceAlpha', 1, 'EdgeColor', 'interp', 'FaceLighting', 'flat');
-    s = surf(u(:,:,i), 'FaceAlpha', 1, 'FaceLighting', 'flat');
-    axis([0 n*L 0 n*H -60 60]);
+    s = surf(X,Y,u(:,:,i), 'FaceAlpha', 1, 'FaceLighting', 'flat');
+    axis([0 L 0 H]);
     pause(1/144)
+end
+
+function grid_points = generate_grid(L,N,alpha)
+x_k = @(alpha,K,L,n) L*alpha*sum((1+alpha).^(K-1))/(2*((1+alpha)^n-1));
+
+n = N/2;
+X = zeros(1,n);
+for i  = 1:n-1
+    K = 1:i;
+    X(i+1) = x_k(alpha, K, L, n);
+end
+
+grid_points = zeros(1,N);
+grid_points(1, 1:n) = X;
+grid_points(1, n+1:N) = L-fliplr(X);
 end

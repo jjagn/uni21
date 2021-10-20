@@ -13,7 +13,7 @@ s = @(x, y, t) 2.*c^2 .* (1 + 0.5.*t) .* (y .* (H-y) + x .* (L-x));
 lambda = 0.6; % constant courant number
 lambda2 = lambda^2;
 
-delta = 0.01;
+delta = 0.05;
 
 animated_plot = 0;
 
@@ -62,19 +62,19 @@ for k = 1:t_n
     results_numerical(:,:,k) = u_n;
 end
 
-% figure()
-% 
-% for time = 1:t_n
-%     subplot(1,2,1)
-%     surf(results_numerical(:,:,time));
-%     axis([0 n*L 0 n*H -2.5 2.5]);
-%     title('numerical solution')
-%     subplot(1,2,2)
-%     surf(results_analytical(:,:,time));
-%     axis([0 n*L 0 n*H -2.5 2.5]);
-%     title('analytical solution')
-%     pause(1/60)
-% end
+figure()
+
+for time = 1:t_n
+    subplot(1,2,1)
+    surf(results_numerical(:,:,time));
+    axis([0 n*L 0 n*H -2.5 2.5]);
+    title('numerical solution')
+    subplot(1,2,2)
+    surf(results_analytical(:,:,time));
+    axis([0 n*L 0 n*H -2.5 2.5]);
+    title('analytical solution')
+    pause(1/60)
+end
 
 figure()
 results = []
