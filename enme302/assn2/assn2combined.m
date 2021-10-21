@@ -22,7 +22,7 @@ lambda = c*dt/delta;
 lambda2 = lambda*lambda;
 
 % ANALYTICAL SOLUTION
-fourier_limit = 5;
+fourier_limit = 1;
 
 u_a = @(x, y, t) 0;
 
@@ -111,12 +111,18 @@ num_plots = 10;
 for time = 1:t_n/num_plots:t_n
     formatspec = 't = %.2f s';
     legendstr = sprintf(formatspec, time);
-    subplot(1,2,1)
+    subplot(1,3,1)
     plot(u(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
     hold on
     legend
     title("u(x, H/2, t) for various times, numerical solution")
-    subplot(1,2,2)
+    subplot(1,3,2)
+    plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
+    colour = colour + 1/num_plots;
+    hold on
+    legend
+    title("u(x, H/2, t) for various times, analytical solution")
+    subplot(1,3,3)
     plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
     colour = colour + 1/num_plots;
     hold on

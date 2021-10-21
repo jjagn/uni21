@@ -1,5 +1,5 @@
 clear; close all; clc
-alpha = 0.3;
+alpha = 0.01;
 L = 2;
 H = 3;
 N = 100;
