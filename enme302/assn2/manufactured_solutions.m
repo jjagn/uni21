@@ -10,15 +10,15 @@ c = 6;
 g = @(x, y, t) 0.5 .* u_e(x, y, t);
 s = @(x, y, t) 2.*c^2 .* (1 + 0.5.*t) .* (y .* (H-y) + x .* (L-x)); 
 
-lambda = 0.6; % constant courant number
+lambda = 0.4; % constant courant number
 lambda2 = lambda^2;
 
-delta = 0.05;
+delta = 0.2;
 
 animated_plot = 0;
 
 grid_size = 1; % physical size of grid
-t_f = 2; % end time of sim
+t_f = 5; % end time of sim
 
 n = round(grid_size/delta); % calculating spatial grid points to maintain constant courant number
 
@@ -34,7 +34,7 @@ t = linspace(0,t_f,t_n);
 [X,Y] = meshgrid(x, y);
 
 u_initial = u_e(X, Y, 0);
-
+results_analytical = zeros(length(y), length(x), length(t));
 for i = 1:t_n
     results_analytical(:,:,i) = u_e(X, Y, t(i));
     surf(results_analytical(:,:,i));
@@ -43,10 +43,12 @@ end
 
 % loop to find solutions, use if statements for boundary conditions
 u_c = u_initial;
+results_numerical = zeros(length(y), length(x), length(t));
 for k = 1:t_n
-    for i = 1:n*L     
-        for j = 1:n*H
-            if i == 1 || j == 1 || i == n*L || j == n*H %% enforcing boundary conditions
+    u_n = zeros(length(y), length(x));
+    for i = 1:length(x)     
+        for j = 1:length(y)
+            if i == 1 || j == 1 || i == length(x) || j == length(y) %% enforcing boundary conditions
                 u_n(j,i) = 0;
             else
                 if k == 1 % implementing special case for first time step, using ghost node to implement V.N. B.C.
@@ -62,27 +64,37 @@ for k = 1:t_n
     results_numerical(:,:,k) = u_n;
 end
 
-figure()
-
+if animated_plot
+filename = 'manufactured solutions.gif';
+gif(filename)
 for time = 1:t_n
     subplot(1,2,1)
-    surf(results_numerical(:,:,time));
-    axis([0 n*L 0 n*H -2.5 2.5]);
+    surf(X, Y, results_numerical(:,:,time));
+    axis([0 L 0 H]);
     title('numerical solution')
     subplot(1,2,2)
-    surf(results_analytical(:,:,time));
-    axis([0 n*L 0 n*H -2.5 2.5]);
+    surf(X, Y, results_analytical(:,:,time));
+    axis([0 L 0 H]);
     title('analytical solution')
-    pause(1/60)
+    if time == 1
+        gif(filename);
+    else
+        gif('DelayTime', 1/60)
+    end
+end
 end
 
 figure()
-results = []
-for time = 1:t_n
-    results = [results results_numerical(round(n*H/2), round(n*L/2), time)];
-    clc
-    fprintf("iteration %d of %d\n", time, t_n)
-    fprintf("progress: %.2f%% \n", time/t_n*100)
+epsilon_array = zeros(1, length(t));
+for time = 1:length(t)
+    tosum = (results_numerical(:,:,time) - results_analytical(:,:,time)).^2;
+    sum2 = sum(tosum, 'all');
+    eps = sqrt(delta^2.*sum2);
+    epsilon_array(time) = eps;
 end
 
-plot(t, results)
+plot(t, epsilon_array)
+xlabel('Time elapsed [s]')
+ylabel('Error (epsilon) [m]')
+title('Error against elapsed time')
+

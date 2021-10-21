@@ -9,11 +9,10 @@ s = 0;
 c = 6;
 n = 10; % spatial grid points
 grid_size = 1; % physical size of grid
-t_n = 500; % number of time points
+t_n = 200; % number of time points
 t_f = 1; % end time of sim
 
 animated_plot = 1;
-gif = 0;
 
 delta = grid_size/n;
 dt = t_f/t_n;
@@ -22,14 +21,14 @@ lambda = c*dt/delta;
 lambda2 = lambda*lambda;
 
 % ANALYTICAL SOLUTION
-fourier_limit = 5;
+a_lim = 5;      % number of fourier series terms
+b_lim = 5;      % "" ""
 
 u_a = @(x, y, t) 0;
 
-for b = 1:fourier_limit
-    for a = 1:fourier_limit
+for b = 1:1:b_lim
+    for a = 1:1:a_lim
         u_a = @(x, y, t) u_a(x, y, t) + (576/pi^6) .* (((1 + (-1)^(a+1)) * (1+(-1)^(b+1))) / (a^3*b^3)).*sin(a.*pi./2.*x).*sin(b.*pi./3.*y).*cos(pi.*sqrt(9.*a.^2+4.*b.^2).*t);
-        u_a(1, 1, 1)
     end
 end
 
@@ -52,56 +51,40 @@ for i = 1:t_n
     results_analytical(:,:,i) = u_a(X, Y, t(i));
 end
 
+figure()
+%surf(X,Y, u_initial) % display initial conditions for verification
+
 % loop to find solutions, use if statements for boundary conditions
-u = zeros(length(y), length(x), length(t));     % preallocate u for speed
-u(:,:,1) = u_initial;
-u(:,:,2) = u_initial;
-for k = 2:length(t)
-    for j = 1:length(y)
-        for i = 1:length(x)
-            % enforcing boundary conditions
-            if i == 1 || j == 1 || i == length(x) || j == length(y) 
-                u(j,i,k+1) = 0;
+results_numerical = zeros(length(y), length(x), length(t));
+results_numerical(:,:,1) = u_initial;
+surf(x,Y,results_numerical(:,:,1))
+for k = 1:t_n
+    for i = 1:length(x)-1     
+        for j = length(y)-1
+            if i == 1 || j == 1 || i == length(x) || j == length(y) %% enforcing boundary conditions
+                results_numerical(j,i,k+1) = 0
+            elseif k == 1
+                results_numerical(j,i,k+1) = 2*(1-2*lambda2).*results_numerical(j,i,k) + lambda2.*(results_numerical(j+1,i,k) + results_numerical(j-1,i,k) + results_numerical(j,i+1,k) + results_numerical(j,i-1,k));
             else
-                u(j,i,k+1) = 2*(1-2*lambda2)*u(j,i,k)+lambda2*(u(j,i+1,k)+u(j,i-1,k)+u(j+1,i,k)+u(j-1,i,k))-u(j,i,k-1);
-            end
+                results_numerical(j,i,k+1) = 2*(1-2*lambda2).*results_numerical(j,i,k) + lambda2.*(results_numerical(j+1,i,k) + results_numerical(j-1,i,k) + results_numerical(j,i+1,k) + results_numerical(j,i-1,k)) - results_numerical(j,i,k-1);
+            end         
         end
     end
 end
 
 figure()
 
-errors = zeros(length(y), length(x), length(t));
-for time = 1:length(t)
-    errors(:,:,time) = results_analytical(:,:,time) - u(:,:,time);
-end
-
 if animated_plot
-    if gif
-    filename = 'combined_solutions.gif';
-    gif(filename)
-    end
     for time = 1:t_n
-        
-        subplot(1,3,1)
-        surf(X, Y, u(:,:,time));
+        subplot(1,2,1)
+        surf(X, Y, results_numerical(:,:,time));
         axis([0 L 0 H -2.5 2.5]);
         title('numerical solution')
-        subplot(1,3,2)
+        subplot(1,2,2)
         surf(X, Y, results_analytical(:,:,time));
         axis([0 L 0 H -2.5 2.5]);
         title('analytical solution')
-        subplot(1,3,3)
-        surf(X,Y,errors(:,:,time))
-        axis([0 L 0 H -0.15 0.15]);
-        title('error')
-        if gif
-        if time == 1
-            gif(filename)
-        else 
-            gif('DelayTime', 1/60)
-        end
-        end
+        pause(1/60)
     end
 end
 
@@ -111,19 +94,12 @@ num_plots = 10;
 for time = 1:t_n/num_plots:t_n
     formatspec = 't = %.2f s';
     legendstr = sprintf(formatspec, time);
-    subplot(1,2,1)
-    plot(u(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
-    hold on
-    legend
-    title("u(x, H/2, t) for various times, numerical solution")
-    subplot(1,2,2)
-    plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
+    plot(results_numerical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
     colour = colour + 1/num_plots;
     hold on
     legend
-    title("u(x, H/2, t) for various times, analytical solution")
 end
-
+title("u(x, H/2, t) for various times, numerical solution")
 
 figure()
 

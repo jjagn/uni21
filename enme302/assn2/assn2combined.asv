@@ -12,8 +12,7 @@ grid_size = 1; % physical size of grid
 t_n = 500; % number of time points
 t_f = 1; % end time of sim
 
-animated_plot = 1;
-gif = 0;
+animated_plot = 0;
 
 delta = grid_size/n;
 dt = t_f/t_n;
@@ -26,10 +25,9 @@ fourier_limit = 5;
 
 u_a = @(x, y, t) 0;
 
-for b = 1:fourier_limit
-    for a = 1:fourier_limit
+for b = 1:1:fourier_limit
+    for a = 1:1:fourier_limit
         u_a = @(x, y, t) u_a(x, y, t) + (576/pi^6) .* (((1 + (-1)^(a+1)) * (1+(-1)^(b+1))) / (a^3*b^3)).*sin(a.*pi./2.*x).*sin(b.*pi./3.*y).*cos(pi.*sqrt(9.*a.^2+4.*b.^2).*t);
-        u_a(1, 1, 1)
     end
 end
 
@@ -95,12 +93,11 @@ if animated_plot
         surf(X,Y,errors(:,:,time))
         axis([0 L 0 H -0.15 0.15]);
         title('error')
-        if gif
+
         if time == 1
             gif(filename)
         else 
             gif('DelayTime', 1/60)
-        end
         end
     end
 end

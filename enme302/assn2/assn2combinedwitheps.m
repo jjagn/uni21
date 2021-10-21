@@ -10,7 +10,8 @@ c = 6;
 
 lambda = 0.25; % constant courant number
 lambda2 = lambda^2;
-nx = [2 4 8 16 32 64 128];
+nx = [8 12 16 24 32 48 56 64 72 96 108 128 192 256];
+nx = fliplr(nx)
 % n_iterations = 20
 % nx = linspace(4, 4*n_iterations, n_iterations)
 
@@ -38,8 +39,8 @@ for b = 1:taylor_expansions
 end
 
 
-x = linspace(0,L,n*L);
-y = linspace(0,H,n*H);
+x = linspace(0,L,n);
+y = linspace(0,H,ny);
 t = linspace(0,t_f,t_n);
 
 [X,Y] = meshgrid(x, y);
@@ -53,8 +54,8 @@ for i = 1:length(x)
         u_initial(j,i) = x(i).*y(j).*(L-x(i)).*(H-y(j));
     end
 end
-figure()
-surf(u_initial)
+% figure()
+% surf(X,Y,u_initial)
 
 results_analytical = zeros(length(y), length(x), length(t));
 for i = 1:t_n
@@ -62,30 +63,36 @@ for i = 1:t_n
 end
 
 % loop to find solutions, use if statements for boundary conditions
-u_p = u_initial;
-u_c = u_initial;
-results_numerical = zeros(length(y), length(x), length(t));
-for k = 1:t_n
-    u_n = zeros(length(y), length(x));
-    for i = 1:length(x)     
-        for j = 1:length(y)
-            if i == 1 || j == 1 || i == length(x)  || j == length(y)  %% enforcing boundary conditions
-                u_n(j,i) = 0;
+u = zeros(length(y), length(x), length(t));     % preallocate u for speed
+u(:,:,1) = u_initial;
+u(:,:,2) = u_initial;
+for k = 2:length(t)
+    for j = 1:length(y)
+        for i = 1:length(x)
+            % enforcing boundary conditions
+            if i == 1 || j == 1 || i == length(x) || j == length(y) 
+                u(j,i,k+1) = 0;
             else
-                u_n(j,i) = 2*(1-2*lambda2)*u_c(j,i) + lambda2*(u_c(j+1,i) + u_c(j-1,i) + u_c(j,i+1) + u_c(j,i-1)) - u_p(j,i);
-            end         
+                u(j,i,k+1) = 2*(1-2*lambda2)*u(j,i,k)+lambda2*(u(j,i+1,k)+u(j,i-1,k)+u(j+1,i,k)+u(j-1,i,k))-u(j,i,k-1);
+            end
         end
     end
-    u_p = u_c;
-    u_c = u_n;
-    results_numerical(:,:,k) = u_n;
 end
 
 % calculating epsilon
-tosum = (results_numerical(:,:,end) - results_analytical(:,:,end)).^2;
+% figure()
+% surf(X,Y,u(:,:,end))
+% title('numerical')
+% figure()
+% surf(X,Y,results_analytical(:,:,end))
+% title('analytical')
+tosum = (u(:,:,end-1) - results_analytical(:,:,end)).^2;
 sum2 = sum(tosum, 'all');
 
 eps = sqrt(delta^2.*sum2);
 epss = [epss eps];
 end
-plot(fliplr(deltas), epss)
+plot(deltas, epss)
+title('error against grid spacing')
+xlabel('grid spacing (delta)')
+ylabel('error (epsilon)')

@@ -68,3 +68,5 @@ grid_points = zeros(1,N);
 grid_points(1, 1:n) = X;
 grid_points(1, n+1:N) = L-fliplr(X);
 end
+
+

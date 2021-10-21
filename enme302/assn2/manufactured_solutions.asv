@@ -7,18 +7,18 @@ H = 3;
 u_e = @(x, y, t) x.*(L-x).*y.*(H-y).*(1+1/2.*t);
 
 c = 6;
-g = 0;
-s = 0;
+g = @(x, y, t) 0.5 .* u_e(x, y, t);
+s = @(x, y, t) 2.*c^2 .* (1 + 0.5.*t) .* (y .* (H-y) + x .* (L-x)); 
 
 lambda = 0.6; % constant courant number
 lambda2 = lambda^2;
 
-delta = 0.1;
+delta = 0.05;
 
 animated_plot = 0;
 
 grid_size = 1; % physical size of grid
-t_f = 1; % end time of sim
+t_f = 2; % end time of sim
 
 n = round(grid_size/delta); % calculating spatial grid points to maintain constant courant number
 
@@ -43,10 +43,12 @@ end
 
 % loop to find solutions, use if statements for boundary conditions
 u_c = u_initial;
+results_numerical = zeros(length(y), length(x), length(t))
 for k = 1:t_n
-    for i = 1:length(x)-1    
-        for j = 1:length(y)-1
-            if i == 1 || j == 1 || i == length(x) || j == length(y) %% enforcing boundary conditions
+    u_n = zeros(length(y), length(x));
+    for i = 1:length(x)     
+        for j = 1:length(y)
+            if i == 1 || j == 1 || i == n*L || j == n*H %% enforcing boundary conditions
                 u_n(j,i) = 0;
             else
                 if k == 1 % implementing special case for first time step, using ghost node to implement V.N. B.C.
@@ -77,9 +79,9 @@ for time = 1:t_n
 end
 
 figure()
-results = []
+results = zeros(1, length(t))
 for time = 1:t_n
-    results = [results results_numerical(round(n*H/2), round(n*L/2), time)];
+    results(time) = results_numerical(round(n*H/2), round(n*L/2), time)];
     clc
     fprintf("iteration %d of %d\n", time, t_n)
     fprintf("progress: %.2f%% \n", time/t_n*100)
