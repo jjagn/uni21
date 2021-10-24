@@ -10,8 +10,8 @@ c = 6;
 
 lambda = 0.25; % constant courant number
 lambda2 = lambda^2;
-nx = [8 12 16 24 32 48 56 64 72 96 108 128 192 256];
-nx = fliplr(nx)
+nx = [8 12 16 24 32 48 56 64 72 96];
+nx = fliplr(nx);
 % n_iterations = 20
 % nx = linspace(4, 4*n_iterations, n_iterations)
 
@@ -66,30 +66,26 @@ end
 u = zeros(length(y), length(x), length(t));     % preallocate u for speed
 u(:,:,1) = u_initial;
 u(:,:,2) = u_initial;
-for k = 2:length(t)
+for k = 1:length(t)
     for j = 1:length(y)
-        for i = 1:length(x)
+        for i = 1:length(x)  
             % enforcing boundary conditions
             if i == 1 || j == 1 || i == length(x) || j == length(y) 
                 u(j,i,k+1) = 0;
             else
-                u(j,i,k+1) = 2*(1-2*lambda2)*u(j,i,k)+lambda2*(u(j,i+1,k)+u(j,i-1,k)+u(j+1,i,k)+u(j-1,i,k))-u(j,i,k-1);
+                if k == 1
+                    u(j,i,k+1) = (1-(2*lambda2))*u(j,i,k)+0.5*lambda2*(u(j,i+1,k)+u(j,i-1,k)+u(j+1,i,k)+u(j-1,i,k));
+                else
+                    u(j,i,k+1) = 2*(1-2*lambda2)*u(j,i,k)+lambda2*(u(j,i+1,k)+u(j,i-1,k)+u(j+1,i,k)+u(j-1,i,k))-u(j,i,k-1);
+                end
             end
         end
     end
 end
 
-% calculating epsilon
-% figure()
-% surf(X,Y,u(:,:,end))
-% title('numerical')
-% figure()
-% surf(X,Y,results_analytical(:,:,end))
-% title('analytical')
-tosum = (u(:,:,end-1) - results_analytical(:,:,end)).^2;
+tosum = (results_analytical(:,:,end)-u(:,:,end-5)).^2;
 sum2 = sum(tosum, 'all');
-
-eps = sqrt(delta^2.*sum2);
+eps = sqrt(delta.^2.*sum2);
 epss = [epss eps];
 end
 plot(deltas, epss)

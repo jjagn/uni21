@@ -9,7 +9,7 @@ s = 0;
 c = 6;
 n = 10; % spatial grid points
 grid_size = 1; % physical size of grid
-t_n = 500; % number of time points
+t_n = 250; % number of time points
 t_f = 1; % end time of sim
 
 animated_plot = 1;
@@ -18,18 +18,17 @@ gif = 0;
 delta = grid_size/n;
 dt = t_f/t_n;
 
-lambda = c*dt/delta;
+lambda = c*dt/delta
 lambda2 = lambda*lambda;
 
 % ANALYTICAL SOLUTION
-fourier_limit = 1;
+fourier_limit = 5;
 
 u_a = @(x, y, t) 0;
 
 for b = 1:fourier_limit
     for a = 1:fourier_limit
         u_a = @(x, y, t) u_a(x, y, t) + (576/pi^6) .* (((1 + (-1)^(a+1)) * (1+(-1)^(b+1))) / (a^3*b^3)).*sin(a.*pi./2.*x).*sin(b.*pi./3.*y).*cos(pi.*sqrt(9.*a.^2+4.*b.^2).*t);
-        u_a(1, 1, 1)
     end
 end
 
@@ -86,22 +85,32 @@ if animated_plot
         subplot(1,3,1)
         surf(X, Y, u(:,:,time));
         axis([0 L 0 H -2.5 2.5]);
+        caxis([-2.5 2.5])
+%         colorbar
         title('numerical solution')
         subplot(1,3,2)
         surf(X, Y, results_analytical(:,:,time));
         axis([0 L 0 H -2.5 2.5]);
+        caxis([-2.5 2.5])
+%         colorbar
         title('analytical solution')
         subplot(1,3,3)
         surf(X,Y,errors(:,:,time))
-        axis([0 L 0 H -0.15 0.15]);
+        axis([0 L 0 H -0.5 0.5]);
+        caxis([-2.5 2.5])
+%         colorbar
         title('error')
+        set(gcf, 'Position', [0, 0, 720, 480])
         if gif
         if time == 1
             gif(filename)
         else 
             gif('DelayTime', 1/60)
         end
+        else
+            pause(1/240)
         end
+        
     end
 end
 
@@ -111,37 +120,15 @@ num_plots = 10;
 for time = 1:t_n/num_plots:t_n
     formatspec = 't = %.2f s';
     legendstr = sprintf(formatspec, time);
-    subplot(1,3,1)
+    subplot(1,2,1)
     plot(u(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
     hold on
     legend
     title("u(x, H/2, t) for various times, numerical solution")
-    subplot(1,3,2)
+    subplot(1,2,2)
     plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
-    colour = colour + 1/num_plots;
     hold on
     legend
     title("u(x, H/2, t) for various times, analytical solution")
-    subplot(1,3,3)
-    plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
     colour = colour + 1/num_plots;
-    hold on
-    legend
-    title("u(x, H/2, t) for various times, analytical solution")
 end
-
-
-figure()
-
-colour = 0;
-num_plots = 10;
-for time = 1:t_n/num_plots:t_n
-    formatspec = 't = %.2f s';
-    legendstr = sprintf(formatspec, time);
-    plot(results_analytical(round(n*H/2), :, time), 'Color',[1-colour,0,colour], 'DisplayName', legendstr);
-    colour = colour + 1/num_plots;
-    hold on
-    legend
-end
-
-title("u(x, H/2, t) for various times, analytical solution")

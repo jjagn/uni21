@@ -10,10 +10,10 @@ c = 6;
 g = @(x, y, t) 0.5 .* u_e(x, y, t);
 s = @(x, y, t) 2.*c^2 .* (1 + 0.5.*t) .* (y .* (H-y) + x .* (L-x)); 
 
-lambda = 0.6; % constant courant number
+lambda = 0.5; % constant courant number
 lambda2 = lambda^2;
 
-delta = 0.05;
+delta = 0.1;
 
 animated_plot = 0;
 
@@ -27,27 +27,25 @@ t_n = t_f/dt;
 
 % ANALYTICAL SOLUTION
 
-x = linspace(0,L,L/delta+1);
-y = linspace(0,H,H/delta+1);
-t = linspace(0,t_f,t_n);
+x = linspace(0,L,L/delta);
+y = linspace(0,H,H/delta);
+t = 0:dt:t_f;
 
 [X,Y] = meshgrid(x, y);
 
 u_initial = u_e(X, Y, 0);
 
-for i = 1:t_n
+for i = 1:length(t)
     results_analytical(:,:,i) = u_e(X, Y, t(i));
-    surf(results_analytical(:,:,i));
+    surf(X,Y,results_analytical(:,:,i));
 end
 
 
 % loop to find solutions, use if statements for boundary conditions
 u_c = u_initial;
-results_numerical = zeros(length(y), length(x), length(t))
-for k = 1:t_n
-    u_n = zeros(length(y), length(x));
-    for i = 1:length(x)     
-        for j = 1:length(y)
+for k = 1:length(t)
+    for i = 1:n*L     
+        for j = 1:n*H
             if i == 1 || j == 1 || i == n*L || j == n*H %% enforcing boundary conditions
                 u_n(j,i) = 0;
             else
@@ -79,12 +77,15 @@ for time = 1:t_n
 end
 
 figure()
-results = zeros(1, length(t))
-for time = 1:t_n
-    results(time) = results_numerical(round(n*H/2), round(n*L/2), time)];
-    clc
-    fprintf("iteration %d of %d\n", time, t_n)
-    fprintf("progress: %.2f%% \n", time/t_n*100)
+epsilon_array = zeros(1, length(t));
+for time = 1:length(t)
+    tosum = (results_numerical(:,:,time) - results_analytical(:,:,time)).^2;
+    sum2 = sum(tosum, 'all');
+    eps = sqrt(delta^2.*sum2);
+    epsilon_array(time) = eps;
 end
 
-plot(t, results)
+plot(t, epsilon_array)
+xlabel('Time elapsed [s]')
+ylabel('Error (epsilon) [m]')
+title('Error against elapsed time')

@@ -1,16 +1,11 @@
 clear; close all; clc
-alpha = 0.01;
+alpha = 0.05;
 L = 2;
 H = 3;
-N = 100;
+N = 10;
 
-x_points = generate_grid(L, N, alpha);
-y_points = generate_grid(H,N,alpha);
-
-error = zeros(1, N+1);
-for i = 1:N-1
-    error(i) = x_points(i+1) - x_points(i);
-end
+x_points = generate_grid(L,N*L,alpha);
+y_points = generate_grid(H,N*H,alpha);
 
 [X,Y] = meshgrid(x_points, y_points);
 

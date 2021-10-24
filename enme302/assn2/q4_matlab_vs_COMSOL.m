@@ -108,3 +108,4 @@ hold on
 plot(t, d)
 legend('MATLAB', 'COMSOL')
 title('u(L/2, H/2, t) for MATLAB and COMSOL numerical solutions')
+xlabel('Time [s]'); ylabel('Displacement (u) [m]')
